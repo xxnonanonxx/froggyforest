@@ -67,7 +67,6 @@ pub struct GameState {
     player: (usize, usize),
     keyreader: KeyReader,
     player_score: u32,
-    debug_messages: Vec<String>,
 }
 
 impl GameState {
@@ -85,7 +84,6 @@ impl GameState {
             player: (7, 0),
             keyreader: KeyReader::new(),
             player_score: 0,
-            debug_messages: Vec::new(),
         }
     }
 
@@ -112,9 +110,7 @@ impl GameState {
             println!();
         }
         println!("Score: {}", self.player_score);
-        for msg in &self.debug_messages {
-            println!("{}", msg);
-        }
+
     }
 
     pub async fn run(&mut self) {
@@ -179,6 +175,7 @@ impl GameState {
         }
     }
 }
+
 
 #[tokio::main]
 async fn main() {
