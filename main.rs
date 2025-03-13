@@ -67,6 +67,7 @@ pub struct GameState {
     player: (usize, usize),
     keyreader: KeyReader,
     player_score: u32,
+    debug_messages: Vec<String>,
 }
 
 impl GameState {
@@ -84,6 +85,7 @@ impl GameState {
             player: (7, 0),
             keyreader: KeyReader::new(),
             player_score: 0,
+            debug_messages: Vec::new(),
         }
     }
 
@@ -110,6 +112,9 @@ impl GameState {
             println!();
         }
         println!("Score: {}", self.player_score);
+        for msg in &self.debug_messages {
+            println!("{}", msg);
+        }
     }
 
     pub async fn run(&mut self) {
@@ -126,17 +131,17 @@ impl GameState {
                 Key::Char('w') | Key::ArrowUp => {
                     if self.player.1 < 3 {
                         let new_y = self.player.1 + 1;
-                        if !self.gameboard[new_y].objects[self.player.0] {
+                        let is_tree = self.gameboard[new_y].objects[self.player.0];
+                        if !is_tree {
                             self.player.1 = new_y;
                             self.player_score += 1;
                         }
-                    } else {
-                        // Scrolling case: check new row before shifting
-                        let new_row = Row::new_random_row('🌲', '🟩');
-                        if !new_row.objects[self.player.0] {
+                    } else if self.player.1 == 3 {
+                        let next_row_tree = self.gameboard[4].objects[self.player.0];
+                        if !next_row_tree {
+                            let new_row = Row::new_random_row('🌲', '🟩');
                             self.gameboard.remove(0);
                             self.gameboard.push(new_row);
-                            self.player.1 = 3;
                             self.player_score += 1;
                         }
                     }
@@ -144,7 +149,8 @@ impl GameState {
                 Key::Char('a') | Key::ArrowLeft => {
                     if self.player.0 > 0 {
                         let new_x = self.player.0 - 1;
-                        if !self.gameboard[self.player.1].objects[new_x] {
+                        let is_tree = self.gameboard[self.player.1].objects[new_x];
+                        if !is_tree {
                             self.player.0 = new_x;
                         }
                     }
@@ -152,7 +158,8 @@ impl GameState {
                 Key::Char('s') | Key::ArrowDown => {
                     if self.player.1 > 0 {
                         let new_y = self.player.1 - 1;
-                        if !self.gameboard[new_y].objects[self.player.0] {
+                        let is_tree = self.gameboard[new_y].objects[self.player.0];
+                        if !is_tree {
                             self.player.1 = new_y;
                         }
                     }
@@ -160,7 +167,8 @@ impl GameState {
                 Key::Char('d') | Key::ArrowRight => {
                     if self.player.0 < 13 {
                         let new_x = self.player.0 + 1;
-                        if !self.gameboard[self.player.1].objects[new_x] {
+                        let is_tree = self.gameboard[self.player.1].objects[new_x];
+                        if !is_tree {
                             self.player.0 = new_x;
                         }
                     }
